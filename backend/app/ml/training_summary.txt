@@ -1,0 +1,13 @@
+DemandIQ Model Training Summary
+============================================================
+
+Training Date: 2026-02-26 17:39:08.063137
+Model Type: XGBoost Regressor
+Features: 13
+Training Samples: 32
+Test Samples: 8
+
+Test Set Metrics:
+  MAE:  1.3990
+  RMSE: 1.5954
+  R²:   0.9880

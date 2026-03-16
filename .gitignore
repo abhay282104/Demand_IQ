@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+venv/
+.venv/
+ml_env/
+backend/venv/
+
+# Environment files
+.env
+*.env
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Logs and traces
+*.log
+trace.txt
+trace2.txt
+db_load_error.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
