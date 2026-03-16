@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
-import { apiService } from '../services/api'
-import { useToast } from '../hooks/useToast'
-import { CloudUploadIcon, CheckCircleIcon, ExclamationIcon } from './Icons'
+import React, { useState, useEffect } from "react";
+import { apiService } from "../services/api";
+import { useToast } from "../hooks/useToast";
+import { CloudUploadIcon, CheckCircleIcon, ExclamationIcon } from "./Icons";
 import {
   DemandDistributionChart,
   PriceDistributionChart,
@@ -12,128 +12,137 @@ import {
   HolidayImpactChart,
   EconomicIndexChart,
   ConfidenceDistributionChart,
-} from './AnalyticsCharts'
+} from "./AnalyticsCharts";
 
 export const FileUpload = ({ darkMode = false }) => {
-  const [dragActive, setDragActive] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [results, setResults] = useState(null)
-  const [error, setError] = useState(null)
-  const [fileName, setFileName] = useState('')
-  const [selectedFile, setSelectedFile] = useState(null)
-  const { showToast } = useToast()
+  const [dragActive, setDragActive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState(null);
+  const [error, setError] = useState(null);
+  const [fileName, setFileName] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const { showToast } = useToast();
 
   // prediction menu state (manual input)
   const [predictionInput, setPredictionInput] = useState({
-    product: '',
-    store: '',
-    price: '',
-    promotion: '',
-    holiday: '',
-    economic: '',
-  })
-  const [simplePrediction, setSimplePrediction] = useState(null)
+    product: "",
+    store: "",
+    price: "",
+    promotion: "",
+    holiday: "",
+    economic: "",
+  });
+  const [simplePrediction, setSimplePrediction] = useState(null);
 
   const handleDrag = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true)
-    } else if (e.type === 'dragleave') {
-      setDragActive(false)
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
     }
-  }
+  };
 
   const handleDrop = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setDragActive(false)
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
 
-    const files = e.dataTransfer.files
+    const files = e.dataTransfer.files;
     if (files && files[0]) {
-      setSelectedFile(files[0])
-      setFileName(files[0].name)
-      setResults(null)
-      setError(null)
+      setSelectedFile(files[0]);
+      setFileName(files[0].name);
+      setResults(null);
+      setError(null);
     }
-  }
+  };
 
   const handleChange = (e) => {
-    const files = e.target.files
+    const files = e.target.files;
     if (files && files[0]) {
-      setSelectedFile(files[0])
-      setFileName(files[0].name)
-      setResults(null)
-      setError(null)
+      setSelectedFile(files[0]);
+      setFileName(files[0].name);
+      setResults(null);
+      setError(null);
     }
-  }
+  };
 
   const handleFile = async (file) => {
-    if (!file.name.endsWith('.csv')) {
-      showToast('Please upload a CSV file', 'error')
-      return
+    if (!file.name.endsWith(".csv")) {
+      showToast("Please upload a CSV file", "error");
+      return;
     }
 
-    setFileName(file.name)
-    setLoading(true)
-    setError(null)
-    setResults(null)
+    setFileName(file.name);
+    setLoading(true);
+    setError(null);
+    setResults(null);
 
     try {
-      const formData = new FormData()
-      formData.append('file', file)
-      const axiosResp = await apiService.uploadCSV(formData)
-      const resp = axiosResp.data
+      const formData = new FormData();
+      formData.append("file", file);
+      const axiosResp = await apiService.uploadCSV(formData);
+      const resp = axiosResp.data;
 
-      if (resp && resp.status === 'success') {
-        setResults({ ...resp, type: 'predict' })
-        setSimplePrediction(null)
-        showToast('Predictions generated successfully!', 'success')
+      if (resp && resp.status === "success") {
+        setResults({ ...resp, type: "predict" });
+        setSimplePrediction(null);
+        showToast("Predictions generated successfully!", "success");
       } else {
-        const msg = resp?.detail || 'Unexpected response from server'
-        setError(msg)
-        showToast(msg, 'error')
+        const msg = resp?.detail || "Unexpected response from server";
+        setError(msg);
+        showToast(msg, "error");
       }
     } catch (err) {
-      console.error('upload error', err)
-      const errorMsg = err.response?.data?.detail || 'Failed to upload and process file'
-      setError(errorMsg)
-      showToast(errorMsg, 'error')
+      console.error("upload error", err);
+      const errorMsg =
+        err.response?.data?.detail || "Failed to upload and process file";
+      setError(errorMsg);
+      showToast(errorMsg, "error");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handlePredictionChange = (e) => {
-    const { name, value } = e.target
-    setPredictionInput(prev => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setPredictionInput((prev) => ({ ...prev, [name]: value }));
+  };
 
   const runSimplePrediction = async () => {
     if (!predictionInput.product) {
-      showToast('Please enter a product ID to predict.', 'error')
-      return
+      showToast("Please enter a product ID to predict.", "error");
+      return;
     }
     if (!predictionInput.price) {
-      showToast('Please provide a price for prediction.', 'error')
-      return
+      showToast("Please provide a price for prediction.", "error");
+      return;
     }
     const payload = {
       product_id: parseInt(predictionInput.product),
-      store_id: predictionInput.store ? parseInt(predictionInput.store) : undefined,
+      store_id: predictionInput.store
+        ? parseInt(predictionInput.store)
+        : undefined,
       price: parseFloat(predictionInput.price),
-      promotion_flag: predictionInput.promotion ? parseInt(predictionInput.promotion) : 0,
-      holiday_flag: predictionInput.holiday ? parseInt(predictionInput.holiday) : 0,
-      economic_index: predictionInput.economic ? parseFloat(predictionInput.economic) : 0,
-    }
+      promotion_flag: predictionInput.promotion
+        ? parseInt(predictionInput.promotion)
+        : 0,
+      holiday_flag: predictionInput.holiday
+        ? parseInt(predictionInput.holiday)
+        : 0,
+      economic_index: predictionInput.economic
+        ? parseFloat(predictionInput.economic)
+        : 0,
+    };
     try {
-      const resp = await apiService.predict(payload)
-      setSimplePrediction(resp.data)
+      const resp = await apiService.predict(payload);
+      setSimplePrediction(resp.data);
     } catch (err) {
-      console.error('simple prediction error', err)
-      showToast('Could not get prediction', 'error')
+      console.error("simple prediction error", err);
+      showToast("Could not get prediction", "error");
     }
-  }
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto">
@@ -145,11 +154,11 @@ export const FileUpload = ({ darkMode = false }) => {
           </div>
 
           <div
-            className={`relative border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+            className={`relative rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${
               dragActive
-                ? 'border-primary bg-primary/5'
-                : 'border-gray-300 hover:border-primary/50'
-            } ${loading ? 'opacity-50 pointer-events-none' : ''}`}
+                ? "border-primary bg-primary/5"
+                : "border-slate-300 hover:border-primary/50 dark:border-slate-600"
+            } ${loading ? "opacity-50 pointer-events-none" : ""}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}
@@ -168,14 +177,14 @@ export const FileUpload = ({ darkMode = false }) => {
               <div className="flex justify-center mb-4">
                 <CloudUploadIcon className="w-16 h-16 text-primary/60" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-800 dark:text-white mb-2">
+              <h3 className="mb-2 text-lg font-semibold text-slate-800 dark:text-white">
                 Upload CSV File
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <p className="mb-4 text-slate-600 dark:text-slate-300">
                 Drag and drop your CSV file here or click to browse
               </p>
-              <div className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
-                {loading ? 'Processing...' : 'Select File'}
+              <div className="btn-brand inline-flex px-4 py-2">
+                {loading ? "Processing..." : "Select File"}
               </div>
             </label>
 
@@ -189,7 +198,7 @@ export const FileUpload = ({ darkMode = false }) => {
               <div className="mt-4">
                 <button
                   onClick={() => handleFile(selectedFile)}
-                  className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                  className="btn-brand px-6 py-2"
                 >
                   Prediction & Analysis
                 </button>
@@ -205,15 +214,19 @@ export const FileUpload = ({ darkMode = false }) => {
           <div className="flex items-start gap-3">
             <ExclamationIcon className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-semibold text-red-900 dark:text-red-200">Error</h4>
-              <p className="text-red-800 dark:text-red-300 text-sm mt-1">{error}</p>
+              <h4 className="font-semibold text-red-900 dark:text-red-200">
+                Error
+              </h4>
+              <p className="text-red-800 dark:text-red-300 text-sm mt-1">
+                {error}
+              </p>
             </div>
           </div>
           <button
             onClick={() => {
-              setError(null)
-              setResults(null)
-              setFileName('')
+              setError(null);
+              setResults(null);
+              setFileName("");
             }}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm"
           >
@@ -223,10 +236,10 @@ export const FileUpload = ({ darkMode = false }) => {
       )}
 
       {/* Results Display */}
-      {results && (results.type === 'predict' || results.type === 'train') && (
+      {results && (results.type === "predict" || results.type === "train") && (
         <div className="mt-8 space-y-6">
           {/* Training summary (only for train mode) */}
-          {results.type === 'train' && (
+          {results.type === "train" && (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
               <div className="flex items-center gap-3 mb-4">
                 <CheckCircleIcon className="w-6 h-6 text-green-600" />
@@ -237,7 +250,9 @@ export const FileUpload = ({ darkMode = false }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Dataset Rows</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Dataset Rows
+                  </p>
                   <p className="text-2xl font-bold text-blue-600">
                     {results.dataset_summary?.total_rows}
                   </p>
@@ -251,7 +266,9 @@ export const FileUpload = ({ darkMode = false }) => {
                   </p>
                 </div>
                 <div className="p-4 bg-orange-50 dark:bg-orange-900/20 rounded">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Unique Stores</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Unique Stores
+                  </p>
                   <p className="text-2xl font-bold text-orange-600">
                     {results.dataset_summary?.unique_stores}
                   </p>
@@ -261,19 +278,25 @@ export const FileUpload = ({ darkMode = false }) => {
               {results.metrics && (
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">MAE</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      MAE
+                    </p>
                     <p className="text-2xl font-bold text-purple-600">
                       {results.metrics.mae?.toFixed(2)}
                     </p>
                   </div>
                   <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">RMSE</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      RMSE
+                    </p>
                     <p className="text-2xl font-bold text-red-600">
                       {results.metrics.rmse?.toFixed(2)}
                     </p>
                   </div>
                   <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">R²</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      R²
+                    </p>
                     <p className="text-2xl font-bold text-yellow-600">
                       {results.metrics.r2?.toFixed(3)}
                     </p>
@@ -294,7 +317,9 @@ export const FileUpload = ({ darkMode = false }) => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded p-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Rows</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Total Rows
+                </p>
                 <p className="text-2xl font-bold text-blue-600">
                   {results.analytics.total_rows}
                 </p>
@@ -308,7 +333,9 @@ export const FileUpload = ({ darkMode = false }) => {
                 </p>
               </div>
               <div className="bg-orange-50 dark:bg-orange-900/20 rounded p-4">
-                <p className="text-sm text-gray-600 dark:text-gray-400">Failed</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Failed
+                </p>
                 <p className="text-2xl font-bold text-orange-600">
                   {results.analytics.failed_predictions}
                 </p>
@@ -320,7 +347,7 @@ export const FileUpload = ({ darkMode = false }) => {
                 <p className="text-2xl font-bold text-purple-600">
                   {results.analytics.average_confidence
                     ? (results.analytics.average_confidence * 100).toFixed(1)
-                    : 'N/A'}
+                    : "N/A"}
                   %
                 </p>
               </div>
@@ -393,7 +420,9 @@ export const FileUpload = ({ darkMode = false }) => {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                  >
                     Product ID
                   </label>
                   <input
@@ -405,7 +434,9 @@ export const FileUpload = ({ darkMode = false }) => {
                   />
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                  >
                     Store ID (optional)
                   </label>
                   <input
@@ -417,7 +448,9 @@ export const FileUpload = ({ darkMode = false }) => {
                   />
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                  >
                     Price
                   </label>
                   <input
@@ -430,7 +463,9 @@ export const FileUpload = ({ darkMode = false }) => {
                   />
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                  >
                     Promotion Flag (0/1)
                   </label>
                   <input
@@ -442,7 +477,9 @@ export const FileUpload = ({ darkMode = false }) => {
                   />
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                  >
                     Holiday Flag (0/1)
                   </label>
                   <input
@@ -454,7 +491,9 @@ export const FileUpload = ({ darkMode = false }) => {
                   />
                 </div>
                 <div>
-                  <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <label
+                    className={`block text-sm font-medium mb-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                  >
                     Economic Index
                   </label>
                   <input
@@ -477,10 +516,22 @@ export const FileUpload = ({ darkMode = false }) => {
 
             {simplePrediction && (
               <div className="mt-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/20">
-                <p className={`text-base ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  For <strong>product {predictionInput.product}</strong>{predictionInput.store ? ` in store ${predictionInput.store}` : ''}, the model predicts a demand of <strong>{Number(simplePrediction.predicted_demand).toLocaleString()}</strong> units.
+                <p
+                  className={`text-base ${darkMode ? "text-white" : "text-gray-900"}`}
+                >
+                  For <strong>product {predictionInput.product}</strong>
+                  {predictionInput.store
+                    ? ` in store ${predictionInput.store}`
+                    : ""}
+                  , the model predicts a demand of{" "}
+                  <strong>
+                    {Number(simplePrediction.predicted_demand).toLocaleString()}
+                  </strong>{" "}
+                  units.
                 </p>
-                <p className={`text-sm mt-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <p
+                  className={`text-sm mt-2 ${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                >
                   Confidence: {simplePrediction.confidence_info}
                 </p>
               </div>
@@ -493,28 +544,55 @@ export const FileUpload = ({ darkMode = false }) => {
               Data Analytics Visualizations
             </h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <DemandDistributionChart data={results.predictions} darkMode={darkMode} />
-              <PriceDistributionChart data={results.predictions} darkMode={darkMode} />
+              <DemandDistributionChart
+                data={results.predictions}
+                darkMode={darkMode}
+              />
+              <PriceDistributionChart
+                data={results.predictions}
+                darkMode={darkMode}
+              />
 
-              <CategoryPerformanceChart data={results.predictions} darkMode={darkMode} />
-              <StorePerformanceChart data={results.predictions} darkMode={darkMode} />
+              <CategoryPerformanceChart
+                data={results.predictions}
+                darkMode={darkMode}
+              />
+              <StorePerformanceChart
+                data={results.predictions}
+                darkMode={darkMode}
+              />
 
               <div className="lg:col-span-2">
-                <ProductPerformanceChart data={results.predictions} darkMode={darkMode} />
+                <ProductPerformanceChart
+                  data={results.predictions}
+                  darkMode={darkMode}
+                />
               </div>
 
               <div className="lg:col-span-2">
-                <PriceElasticityChart data={results.predictions} darkMode={darkMode} />
+                <PriceElasticityChart
+                  data={results.predictions}
+                  darkMode={darkMode}
+                />
               </div>
 
-              <HolidayImpactChart data={results.predictions} darkMode={darkMode} />
+              <HolidayImpactChart
+                data={results.predictions}
+                darkMode={darkMode}
+              />
 
               <div className="lg:col-span-2">
-                <EconomicIndexChart data={results.predictions} darkMode={darkMode} />
+                <EconomicIndexChart
+                  data={results.predictions}
+                  darkMode={darkMode}
+                />
               </div>
 
               <div className="lg:col-span-2">
-                <ConfidenceDistributionChart data={results.predictions} darkMode={darkMode} />
+                <ConfidenceDistributionChart
+                  data={results.predictions}
+                  darkMode={darkMode}
+                />
               </div>
             </div>
           </div>
@@ -523,9 +601,9 @@ export const FileUpload = ({ darkMode = false }) => {
           <div className="flex gap-4 justify-center">
             <button
               onClick={() => {
-                setResults(null)
-                setFileName('')
-                setError(null)
+                setResults(null);
+                setFileName("");
+                setError(null);
               }}
               className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
             >
@@ -533,8 +611,8 @@ export const FileUpload = ({ darkMode = false }) => {
             </button>
             <button
               onClick={() => {
-                const csv = convertToCSV(results.predictions)
-                downloadCSV(csv, 'predictions_results.csv')
+                const csv = convertToCSV(results.predictions);
+                downloadCSV(csv, "predictions_results.csv");
               }}
               className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
@@ -544,54 +622,54 @@ export const FileUpload = ({ darkMode = false }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 // Helper function to convert predictions to CSV
 const convertToCSV = (predictions) => {
   const headers = [
-    'Date',
-    'Product ID',
-    'Store ID',
-    'Category ID',
-    'Price',
-    'Promotion',
-    'Holiday',
-    'Economic Index',
-    'Predicted Demand',
-    'Confidence (%)',
-    'Actual Demand',
-  ]
+    "Date",
+    "Product ID",
+    "Store ID",
+    "Category ID",
+    "Price",
+    "Promotion",
+    "Holiday",
+    "Economic Index",
+    "Predicted Demand",
+    "Confidence (%)",
+    "Actual Demand",
+  ];
 
   const rows = predictions.map((pred) => [
-    pred.date || '',
-    pred.product_id || '',
-    pred.store_id || '',
-    pred.category_id || '',
-    pred.price || '',
-    pred.promotion_flag || '',
-    pred.holiday_flag || '',
-    pred.economic_index || '',
-    pred.predicted_demand?.toFixed(2) || '',
-    pred.confidence ? (pred.confidence * 100).toFixed(1) : '',
-    pred.actual_demand?.toFixed(2) || '',
-  ])
+    pred.date || "",
+    pred.product_id || "",
+    pred.store_id || "",
+    pred.category_id || "",
+    pred.price || "",
+    pred.promotion_flag || "",
+    pred.holiday_flag || "",
+    pred.economic_index || "",
+    pred.predicted_demand?.toFixed(2) || "",
+    pred.confidence ? (pred.confidence * 100).toFixed(1) : "",
+    pred.actual_demand?.toFixed(2) || "",
+  ]);
 
   const csvContent = [
-    headers.join(','),
-    ...rows.map((row) => row.join(',')),
-  ].join('\n')
+    headers.join(","),
+    ...rows.map((row) => row.join(",")),
+  ].join("\n");
 
-  return csvContent
-}
+  return csvContent;
+};
 
 // Helper function to download CSV
 const downloadCSV = (csvContent, fileName) => {
-  const blob = new Blob([csvContent], { type: 'text/csv' })
-  const url = window.URL.createObjectURL(blob)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = fileName
-  link.click()
-  window.URL.revokeObjectURL(url)
-}
+  const blob = new Blob([csvContent], { type: "text/csv" });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  window.URL.revokeObjectURL(url);
+};

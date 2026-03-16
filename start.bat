@@ -28,33 +28,35 @@ if errorlevel 1 (
     exit /b 1
 )
 
-REM Training model (if needed)
-if not exist "backend\app\ml\model.pkl" (
-    echo.
-    echo ============================================================
-    echo STEP 1: Training ML Model
-    echo ============================================================
-    echo.
-    
-    if not exist "ml_env" (
-        python -m venv ml_env
-    )
-    
-    call ml_env\Scripts\activate.bat
-    pip install -q pandas numpy scikit-learn xgboost joblib 2>nul
-    
-    python ml\train.py "demand_forecasting_dataset (1).csv"
-    
+REM Check if MongoDB is available
+echo.
+echo ============================================================
+echo STEP 1: Checking MongoDB
+echo ============================================================
+echo.
+
+sc query MongoDB >nul 2>&1
+if errorlevel 1 (
+    echo MongoDB service not found. Attempting to start mongod directly...
+    where mongod >nul 2>&1
     if errorlevel 1 (
-        echo.
-        echo ERROR: Model training failed
+        echo ERROR: MongoDB is not installed or not in PATH.
+        echo Please install MongoDB and ensure 'mongod' is in your PATH,
+        echo or start MongoDB manually before running this script.
         pause
         exit /b 1
     )
-    
-    echo.
-    echo ✓ Model training complete
-    echo.
+    start /b mongod --dbpath "%USERPROFILE%\data\db" >nul 2>&1
+    timeout /t 3 /nobreak >nul
+    echo ✓ mongod started
+) else (
+    sc query MongoDB | find "RUNNING" >nul 2>&1
+    if errorlevel 1 (
+        echo Starting MongoDB service...
+        net start MongoDB >nul 2>&1
+        timeout /t 3 /nobreak >nul
+    )
+    echo ✓ MongoDB is running
 )
 
 REM Setup backend
@@ -73,15 +75,48 @@ if not exist "venv" (
 call venv\Scripts\activate.bat
 pip install -q -r requirements.txt 2>nul
 
+REM Train model (if needed) — reuse backend venv
+cd ..
+if not exist "backend\app\ml\model.pkl" (
+    echo.
+    echo ============================================================
+    echo STEP 3: Training ML Model
+    echo ============================================================
+    echo.
+
+    cd backend
+    python ..\ml\train.py "..\demand_forecasting_dataset (1).csv"
+
+    if errorlevel 1 (
+        echo.
+        echo ERROR: Model training failed
+        pause
+        exit /b 1
+    )
+
+    echo.
+    echo ✓ Model training complete
+    echo.
+    cd ..
+)
+
+cd backend
+
 echo.
 echo ============================================================
-echo STEP 3: Starting Backend Server
+echo STEP 4: Starting Backend Server
 echo ============================================================
 echo.
+echo Checking for existing backend process on port 8000...
+for /f "tokens=5" %%p in ('netstat -ano ^| findstr ":8000" ^| findstr "LISTENING"') do (
+    echo Stopping stale backend process PID %%p
+    taskkill /PID %%p /F >nul 2>&1
+)
+
 echo Starting FastAPI server on http://localhost:8000
 echo.
 
-start /b python -m app.main
+start /b "" venv\Scripts\python.exe -m app.main
 
 REM Give backend time to start
 timeout /t 3 /nobreak

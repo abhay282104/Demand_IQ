@@ -6,6 +6,14 @@ from app.schemas.schemas import (
     SalesDataResponse,
     HealthResponse,
     TrainingResponse,
+    UserRegisterRequest,
+    UserLoginRequest,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
+    UpdateProfileRequest,
+    UserResponse,
+    TokenResponse,
+    PredictionHistoryItem,
 )
 
 __all__ = [
@@ -16,4 +24,12 @@ __all__ = [
     "SalesDataResponse",
     "HealthResponse",
     "TrainingResponse",
+    "UserRegisterRequest",
+    "UserLoginRequest",
+    "ForgotPasswordRequest",
+    "ResetPasswordRequest",
+    "UpdateProfileRequest",
+    "UserResponse",
+    "TokenResponse",
+    "PredictionHistoryItem",
 ]

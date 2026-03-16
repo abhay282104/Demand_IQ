@@ -1,23 +1,145 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  :root {
+    --bg: #f2f6f7;
+    --surface: #ffffff;
+    --surface-soft: #ecf2f5;
+    --text: #152330;
+    --muted: #4d6478;
+    --border: #d6e3eb;
+    --brand: #0f766e;
+    --brand-soft: #d7f1ee;
+    --brand-strong: #115e59;
+    --accent: #0f4c81;
+    --danger: #c2410c;
+  }
+
+  .dark {
+    --bg: #0b1218;
+    --surface: #111c25;
+    --surface-soft: #1a2936;
+    --text: #deedf8;
+    --muted: #95adc0;
+    --border: #284050;
+    --brand: #2dd4bf;
+    --brand-soft: #153638;
+    --brand-strong: #5eead4;
+    --accent: #60a5fa;
+    --danger: #fb923c;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: "Manrope", sans-serif;
+    background:
+      radial-gradient(circle at 0% 0%, #d8ecff 0%, transparent 34%),
+      radial-gradient(circle at 100% 0%, #c5f1ea 0%, transparent 28%), var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+  }
+
+  .dark body {
+    background:
+      radial-gradient(circle at 10% 0%, #0f2b45 0%, transparent 32%),
+      radial-gradient(circle at 90% 0%, #11343a 0%, transparent 28%), var(--bg);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Outfit", sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font-family: inherit;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
-}
+@layer components {
+  .app-shell {
+    @apply min-h-screen;
+  }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  .panel-card {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    @apply rounded-2xl shadow-sm;
+  }
+
+  .panel-soft {
+    background-color: color-mix(
+      in srgb,
+      var(--surface) 75%,
+      var(--surface-soft) 25%
+    );
+    border: 1px solid var(--border);
+    @apply rounded-2xl;
+  }
+
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .page-hero {
+    background: linear-gradient(120deg, #0f766e 0%, #0f4c81 75%);
+    @apply text-white rounded-b-3xl border-b border-white/15 shadow-lg;
+  }
+
+  .stat-pill {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+    background-color: color-mix(in srgb, var(--brand-soft) 65%, transparent);
+    color: var(--brand-strong);
+    border: 1px solid color-mix(in srgb, var(--brand) 35%, transparent);
+  }
+
+  .form-input {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    @apply w-full px-4 py-2.5 rounded-xl outline-none transition-all duration-200;
+  }
+
+  .form-input:focus {
+    border-color: color-mix(in srgb, var(--brand) 65%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent);
+  }
+
+  .btn-brand {
+    background: linear-gradient(120deg, var(--brand) 0%, var(--accent) 100%);
+    @apply inline-flex items-center justify-center text-white font-semibold px-5 py-2.5 rounded-xl transition-transform duration-200;
+  }
+
+  .btn-brand:hover {
+    transform: translateY(-1px);
+  }
+
+  .btn-brand:disabled {
+    @apply opacity-60 cursor-not-allowed;
+    transform: none;
+  }
 }
 
 @keyframes fadeIn {
@@ -50,7 +172,6 @@ body {
   animation: slideDown 0.3s ease-out;
 }
 
-/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -61,30 +182,31 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
+  background: #98afbf;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
+  background: #7f98aa;
 }
 
 .dark {
   ::-webkit-scrollbar-thumb {
-    background: #4b5563;
+    background: #3c5568;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
+    background: #4f6a7f;
   }
 }
 
-/* Chart customization */
 .recharts-tooltip {
   border-radius: 8px !important;
 }
 
-/* Smooth transitions */
-* {
-  @apply transition-colors duration-200;
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

@@ -1,36 +1,56 @@
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
 # Python
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
+*$py.class
+*.so
 .pytest_cache/
 .mypy_cache/
+.coverage
+htmlcov/
+*.egg
+*.egg-info/
+dist/
+build/
 
 # Virtual environments
 venv/
 .venv/
+env/
+ENV/
 ml_env/
 backend/venv/
+backend/.venv/
+backend/env/
 
 # Environment files
 .env
-*.env
+.env.*
+!.env.example
 
 # Databases
 *.db
 *.sqlite
 *.sqlite3
 
-# Frontend
+# Frontend (Node/React/Vite)
+node_modules/
 frontend/node_modules/
 frontend/dist/
+frontend/build/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Logs and traces
 *.log
 trace.txt
 trace2.txt
 db_load_error.log
-
-# OS / editor
-.DS_Store
-Thumbs.db

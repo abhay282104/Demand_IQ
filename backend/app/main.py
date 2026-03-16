@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from app.config import settings
 from app.database import init_db
 from app.services import PredictionService, ModelService
-from app.routes import predictions_router, sales_router, health_router
+from app.routes import predictions_router, sales_router, health_router, auth_router
 
 # Configure logging
 logging.basicConfig(
@@ -20,7 +20,7 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
         logging.StreamHandler(sys.stdout),
-    ]
+    ],
 )
 
 logger = logging.getLogger(__name__)
@@ -29,57 +29,60 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan context manager for startup and shutdown."""
-    
+
     # Startup
     logger.info("=" * 50)
     logger.info("DemandIQ API Starting Up")
     logger.info("=" * 50)
-    
+
     try:
         # Initialize database
         logger.info("Initializing database...")
         init_db()
         logger.info("✓ Database initialized")
-        
+
         # Load ML model
         logger.info("Loading machine learning model...")
         model = ModelService.load_model()
         scaler = ModelService.load_scaler()
         encoder = ModelService.load_encoder()
-        
+
         if model is None:
             logger.warning("⚠ Model not found. Predictions may not work.")
             logger.warning("  Run 'python ml/train.py' to train and save the model.")
             from app.routes.health import set_model_loaded
+
             set_model_loaded(False)
         else:
             logger.info("✓ Model loaded successfully")
             logger.info(f"✓ Model version: {settings.model_version}")
-            
+
             from app.routes.health import set_model_loaded
+
             set_model_loaded(True)
-        
+
         # Initialize prediction service
         prediction_service = PredictionService(
             model=model,
             scaler=scaler,
             encoder=encoder,
         )
-        
+
         from app.routes.predictions import set_prediction_service
+
         set_prediction_service(prediction_service)
-        
+
         logger.info("✓ Prediction service initialized")
         logger.info("=" * 50)
         logger.info("DemandIQ API Ready (UTC: {})".format(datetime.utcnow()))
         logger.info("=" * 50)
-        
+
         yield
-        
+
     except Exception as e:
         logger.error(f"Startup error: {str(e)}", exc_info=True)
         raise
-    
+
     # Shutdown
     finally:
         logger.info("=" * 50)
@@ -114,13 +117,14 @@ async def global_exception_handler(request, exc):
         status_code=500,
         content={
             "detail": "Internal server error",
-            "error": str(exc) if settings.debug else "An error occurred"
-        }
+            "error": str(exc) if settings.debug else "An error occurred",
+        },
     )
 
 
 # Include routers
 app.include_router(health_router)
+app.include_router(auth_router)
 app.include_router(predictions_router)
 app.include_router(sales_router)
 
@@ -133,13 +137,13 @@ async def root():
         "version": settings.api_version,
         "description": settings.api_description,
         "docs": "/docs",
-        "openapi": "/openapi.json"
+        "openapi": "/openapi.json",
     }
 
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",

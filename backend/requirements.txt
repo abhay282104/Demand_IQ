@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
-sqlalchemy
+pymongo
 pydantic
 pydantic-settings
 pandas
@@ -10,3 +10,6 @@ xgboost
 joblib
 python-dotenv
 python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+email-validator

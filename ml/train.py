@@ -372,7 +372,12 @@ class DemandForecastingPipeline:
             features_path = os.path.join(self.output_dir, "features.pkl")
             joblib.dump(self.feature_names, features_path)
             logger.info(f"✓ Features saved to: {features_path}")
-            
+
+            # Save encoder placeholder (LabelEncoder not used; kept for API compatibility)
+            encoder_path = os.path.join(self.output_dir, "encoder.pkl")
+            joblib.dump(None, encoder_path)
+            logger.info(f"✓ Encoder saved to: {encoder_path}")
+
             # Save metrics to JSON
             import json
             metrics_path = os.path.join(self.output_dir, "metrics.json")

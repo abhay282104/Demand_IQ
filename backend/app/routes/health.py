@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from pymongo.database import Database
 
 from app.database import get_db
 from app.schemas import HealthResponse
@@ -25,22 +25,22 @@ def is_model_loaded() -> bool:
 
 
 @router.get("/health", response_model=HealthResponse, tags=["Health"])
-async def health_check(db: Session = Depends(get_db)):
+async def health_check(db: Database = Depends(get_db)):
     """
     Health check endpoint.
-    
+
     Returns:
         HealthResponse: Status of API, model, and database connections
     """
-    
+
     try:
         # Database check
-        db.execute("SELECT 1")
+        db.command("ping")
         db_connected = True
     except Exception as e:
         logger.error(f"Database connection error: {str(e)}")
         db_connected = False
-    
+
     return HealthResponse(
         status="healthy" if db_connected and model_loaded else "degraded",
         model_loaded=model_loaded,
