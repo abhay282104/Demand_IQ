@@ -28,13 +28,14 @@ class SalesService:
     def get_sales_by_product(
         product_id: int, db: Database, days: int = 365
     ) -> list[SalesDataResponse]:
-        """Get sales data for a specific product."""
+        """Get sales data for a specific product with index optimization."""
         start_date = datetime.utcnow() - timedelta(days=days)
+        # Using sorted compound index: {product_id: 1, date: -1}
         sales = list(
             db.sales_data.find(
-                {"product_id": product_id, "date": {"$gte": start_date}},
+                {"product_id": product_id, "date": {"$gte": start_date.isoformat()}},
                 {"_id": 0},
-            ).sort("date", -1)
+            ).sort([("product_id", 1), ("date", -1)]).hint("idx_sales_compound_query_v2")
         )
         return [SalesService._doc_to_sales_response(s) for s in sales]
 
@@ -42,13 +43,14 @@ class SalesService:
     def get_sales_by_store(
         store_id: int, db: Database, days: int = 365
     ) -> list[SalesDataResponse]:
-        """Get sales data for a specific store."""
+        """Get sales data for a specific store with index optimization."""
         start_date = datetime.utcnow() - timedelta(days=days)
+        # Using trend index: {store_id: 1, date: -1}
         sales = list(
             db.sales_data.find(
-                {"store_id": store_id, "date": {"$gte": start_date}},
+                {"store_id": store_id, "date": {"$gte": start_date.isoformat()}},
                 {"_id": 0},
-            ).sort("date", -1)
+            ).sort([("store_id", 1), ("date", -1)]).hint("idx_store_sales_trend")
         )
         return [SalesService._doc_to_sales_response(s) for s in sales]
 
