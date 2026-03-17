@@ -321,7 +321,7 @@ export const FileUpload = ({ darkMode = false }) => {
                   Total Rows
                 </p>
                 <p className="text-2xl font-bold text-blue-600">
-                  {results.analytics.total_rows}
+                  {results.analytics?.total_rows || 0}
                 </p>
               </div>
               <div className="bg-green-50 dark:bg-green-900/20 rounded p-4">
@@ -329,7 +329,7 @@ export const FileUpload = ({ darkMode = false }) => {
                   Successful
                 </p>
                 <p className="text-2xl font-bold text-green-600">
-                  {results.analytics.successful_predictions}
+                  {results.analytics?.successful_predictions || 0}
                 </p>
               </div>
               <div className="bg-orange-50 dark:bg-orange-900/20 rounded p-4">
@@ -337,7 +337,7 @@ export const FileUpload = ({ darkMode = false }) => {
                   Failed
                 </p>
                 <p className="text-2xl font-bold text-orange-600">
-                  {results.analytics.failed_predictions}
+                  {results.analytics?.failed_predictions || 0}
                 </p>
               </div>
               <div className="bg-purple-50 dark:bg-purple-900/20 rounded p-4">
@@ -345,16 +345,16 @@ export const FileUpload = ({ darkMode = false }) => {
                   Avg Confidence
                 </p>
                 <p className="text-2xl font-bold text-purple-600">
-                  {results.analytics.average_confidence
+                  {results.analytics?.average_confidence
                     ? (results.analytics.average_confidence * 100).toFixed(1)
-                    : "N/A"}
+                    : "0.0"}
                   %
                 </p>
               </div>
             </div>
 
             {/* Analytics Details */}
-            {results.analytics.average_predicted_demand && (
+            {results.analytics?.average_predicted_demand !== undefined && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <div>
                   <p className="text-xs text-gray-600 dark:text-gray-400 uppercase">
@@ -380,7 +380,7 @@ export const FileUpload = ({ darkMode = false }) => {
                     {results.analytics.max_predicted_demand.toFixed(2)}
                   </p>
                 </div>
-                {results.analytics.mae && (
+                {results.analytics?.mae !== undefined && (
                   <>
                     <div>
                       <p className="text-xs text-gray-600 dark:text-gray-400 uppercase">

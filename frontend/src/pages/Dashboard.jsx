@@ -37,33 +37,6 @@ export const Dashboard = ({ darkMode, setDarkMode }) => {
               quality in one production-ready workspace.
             </p>
           </div>
-
-          <div className="page-container pb-8">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-              <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-3">
-                <p className="text-xs uppercase tracking-wide text-white/75">
-                  Model status
-                </p>
-                <p className="mt-1 text-lg font-semibold">
-                  {summary ? "Loaded" : "Syncing"}
-                </p>
-              </div>
-              <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-3">
-                <p className="text-xs uppercase tracking-wide text-white/75">
-                  Active products
-                </p>
-                <p className="mt-1 text-lg font-semibold">
-                  {summary?.total_products || 0}
-                </p>
-              </div>
-              <div className="rounded-xl border border-white/20 bg-white/10 px-4 py-3">
-                <p className="text-xs uppercase tracking-wide text-white/75">
-                  Data freshness
-                </p>
-                <p className="mt-1 text-lg font-semibold">Live API Feed</p>
-              </div>
-            </div>
-          </div>
         </section>
 
         <section className="page-container -mt-2 py-8">
@@ -166,37 +139,12 @@ export const Dashboard = ({ darkMode, setDarkMode }) => {
             <FileUpload darkMode={darkMode} />
           </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-2">
+          <div className="mt-8">
             <StatusCard
               status="healthy"
               message="All systems operational"
               darkMode={darkMode}
             />
-            <div className="panel-card p-6">
-              <h3 className="mb-4 font-semibold text-slate-900 dark:text-white">
-                System Statistics
-              </h3>
-              <div className="space-y-2">
-                <p className="text-sm text-slate-600 dark:text-slate-300">
-                  Total Products:{" "}
-                  <span className="font-semibold">
-                    {summary?.total_products || 0}
-                  </span>
-                </p>
-                <p className="text-sm text-slate-600 dark:text-slate-300">
-                  Total Stores:{" "}
-                  <span className="font-semibold">
-                    {summary?.total_stores || 0}
-                  </span>
-                </p>
-                <p className="text-sm text-slate-600 dark:text-slate-300">
-                  Total Predictions:{" "}
-                  <span className="font-semibold">
-                    {summary?.total_predictions || 0}
-                  </span>
-                </p>
-              </div>
-            </div>
           </div>
         </section>
       </main>

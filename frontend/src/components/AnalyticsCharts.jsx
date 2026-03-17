@@ -40,24 +40,26 @@ const COLORS = [
 export const DemandDistributionChart = ({ data, darkMode }) => {
   if (!data || data.length === 0) return <EmptyChart darkMode={darkMode} />;
 
-  const min = Math.min(
-    ...data.map((d) => d.predicted_demand || d.target_demand || 0),
-  );
-  const max = Math.max(
-    ...data.map((d) => d.predicted_demand || d.target_demand || 0),
-  );
-  const range = (max - min) / 10;
+  const values = data.map((d) => d.predicted_demand || d.target_demand || 0);
+  const getMin = (arr) => arr.reduce((m, v) => (v < m ? v : m), arr[0] || 0);
+  const getMax = (arr) => arr.reduce((m, v) => (v > m ? v : m), arr[0] || 0);
+  
+  const minVal = getMin(values);
+  const maxVal = getMax(values);
+  const range = (maxVal - minVal) / 10 || 1;
   const bins = Array(10)
     .fill(0)
     .map((_, i) => ({
-      range: `${(min + i * range).toFixed(0)}-${(min + (i + 1) * range).toFixed(0)}`,
+      range: `${(minVal + i * range).toFixed(0)}-${(minVal + (i + 1) * range).toFixed(0)}`,
       count: 0,
     }));
 
   data.forEach((d) => {
     const value = d.predicted_demand || d.target_demand || 0;
-    const binIndex = Math.min(Math.floor((value - min) / range), 9);
-    bins[binIndex].count++;
+    const binIndex = Math.min(Math.floor((value - minVal) / range), 9);
+    if (binIndex >= 0 && binIndex < 10) {
+      bins[binIndex].count++;
+    }
   });
 
   return (
@@ -90,19 +92,25 @@ export const PriceDistributionChart = ({ data, darkMode }) => {
   const prices = data.filter((d) => d.price !== undefined);
   if (prices.length === 0) return <EmptyChart darkMode={darkMode} />;
 
-  const min = Math.min(...prices.map((p) => p.price));
-  const max = Math.max(...prices.map((p) => p.price));
-  const range = (max - min) / 10;
+  const pricesValues = prices.map((p) => p.price);
+  const getMin = (arr) => arr.reduce((m, v) => (v < m ? v : m), arr[0] || 0);
+  const getMax = (arr) => arr.reduce((m, v) => (v > m ? v : m), arr[0] || 0);
+  
+  const minVal = getMin(pricesValues);
+  const maxVal = getMax(pricesValues);
+  const range = (maxVal - minVal) / 10 || 1;
   const bins = Array(10)
     .fill(0)
     .map((_, i) => ({
-      range: `$${(min + i * range).toFixed(2)}-$${(min + (i + 1) * range).toFixed(2)}`,
+      range: `$${(minVal + i * range).toFixed(2)}-$${(minVal + (i + 1) * range).toFixed(2)}`,
       count: 0,
     }));
 
   prices.forEach((p) => {
-    const binIndex = Math.min(Math.floor((p.price - min) / range), 9);
-    bins[binIndex].count++;
+    const binIndex = Math.min(Math.floor((p.price - minVal) / range), 9);
+    if (binIndex >= 0 && binIndex < 10) {
+      bins[binIndex].count++;
+    }
   });
 
   return (

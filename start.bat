@@ -35,29 +35,7 @@ echo STEP 1: Checking MongoDB
 echo ============================================================
 echo.
 
-sc query MongoDB >nul 2>&1
-if errorlevel 1 (
-    echo MongoDB service not found. Attempting to start mongod directly...
-    where mongod >nul 2>&1
-    if errorlevel 1 (
-        echo ERROR: MongoDB is not installed or not in PATH.
-        echo Please install MongoDB and ensure 'mongod' is in your PATH,
-        echo or start MongoDB manually before running this script.
-        pause
-        exit /b 1
-    )
-    start /b mongod --dbpath "%USERPROFILE%\data\db" >nul 2>&1
-    timeout /t 3 /nobreak >nul
-    echo ✓ mongod started
-) else (
-    sc query MongoDB | find "RUNNING" >nul 2>&1
-    if errorlevel 1 (
-        echo Starting MongoDB service...
-        net start MongoDB >nul 2>&1
-        timeout /t 3 /nobreak >nul
-    )
-    echo ✓ MongoDB is running
-)
+echo Skip MongoDB local check. Relying on Atlas DB...
 
 REM Setup backend
 echo.
