@@ -154,11 +154,10 @@ export const FileUpload = ({ darkMode = false }) => {
           </div>
 
           <div
-            className={`relative rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${
-              dragActive
+            className={`relative rounded-2xl border-2 border-dashed p-8 text-center transition-colors ${dragActive
                 ? "border-primary bg-primary/5"
                 : "border-slate-300 hover:border-primary/50 dark:border-slate-600"
-            } ${loading ? "opacity-50 pointer-events-none" : ""}`}
+              } ${loading ? "opacity-50 pointer-events-none" : ""}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
             onDragOver={handleDrag}

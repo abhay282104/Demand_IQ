@@ -489,3 +489,9 @@ async def train_model(
     except Exception as e:
         logger.error(f"Training error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Training failed: {str(e)}")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Training error: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Training failed: {str(e)}")
